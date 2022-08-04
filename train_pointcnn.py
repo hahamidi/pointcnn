@@ -236,12 +236,12 @@ if __name__ == '__main__':
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.batch_size,
                                                         shuffle=True,
-                                                        num_workers=args.number_of_workers,drop_last=True)
+                                                        num_workers=2,drop_last=True)
     test_dataset = ShapeNetPart(partition='test', num_points=args.num_points, class_choice=args.class_choice)
     test_dataloader = torch.utils.data.DataLoader(test_dataset,
                                                         batch_size=args.batch_size,
                                                         shuffle=True,
-                                                        num_workers=args.number_of_workers,drop_last=True)
+                                                        num_workers=2,drop_last=True)
 
 
 
