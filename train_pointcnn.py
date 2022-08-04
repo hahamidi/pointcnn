@@ -248,7 +248,7 @@ if __name__ == '__main__':
 
     # create model and optimizer
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = POINTCNN_SEG_attention(train_dataset.seg_num_all)
+    model = POINTCNN_SEG(train_dataset.seg_num_all)
     model.to(device)       
     opt = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
     if args.scheduler == 'cos':
