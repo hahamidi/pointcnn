@@ -261,11 +261,12 @@ class POINTCNN_SEG_2(torch.nn.Module):
 
         pos_loop = pos0
         batch_loop = batch0
-        X_loop = None
-        X_loop =  X_loop.to(self.device)
+        # X_loop = None
+        # X_loop =  X_loop.to(self.device)
 
         for index,layer in enumerate(self.Down_layers):
-
+            if index == 0:
+                X_loop = layer(None,pos_loop,batch_loop)
             X_loop = layer(X_loop,pos_loop,batch_loop)
             forward_down_features.append(X_loop)
             if self.down_sample[index] != 0 :
