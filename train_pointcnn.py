@@ -248,7 +248,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(train_dataset.seg_num_all)
     model.to(device)       
-    opt = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    opt = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
 
     if args.scheduler == 'cos':
         scheduler = CosineAnnealingLR(opt, args.epochs, eta_min=1e-3)
