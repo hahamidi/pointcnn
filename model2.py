@@ -276,7 +276,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         # from batch [N] and data [P,C] to batch [N,P,C]
 
 
-        out_batch = torch.zeros(self.batch_size,self.num_classes,pos4.shape[0]) 
+        out_batch = torch.zeros(self.batch_size,self.num_classes,int(pos4.shape[0] / self.batch_size)) #[N,num_classes,number_of_point]
         print(out_batch.shape)
         print(x4)
         out = x4.T
@@ -338,7 +338,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         X_OUT = self.fc_lyaer2(X_OUT)
 
         X_OUT = self.after_pred(X_OUT,batch=batch0)
-        print(X_OUT.shape)
+        # print(X_OUT.shape)
 
 
         return X_OUT
