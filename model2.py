@@ -158,3 +158,49 @@ class POINTCNN_SEG(torch.nn.Module):
 
 
         return X_OUT
+
+
+
+class POINTCNN_SEG_2(torch.nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        layer_down      = [256,512,768,1024]
+        layer_up        = [1024,768,512,256]
+
+        hidden_layer_down      = [(0 + 256) / 2, (256 + 512) / 2, (512 + 768) / 2, (768 + 1024) / 2]
+        hidden_layer_up   = [(1024 + 768) / 2, (768 + 512) / 2, (512 + 256) / 2, (256 + 0) / 2]
+
+        kernel_size_down       = [8,12,16,16]
+        kernel_size_up         = [16,16,12,8]
+
+        dilation_down          = [1,2,2,4]
+        dilation_up            = [4,2,2,2]
+
+        self.down_sample = [0.375,0.375,0.375,0.375]
+
+        self.num_classes = num_classes
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.batch_size = 16
+        self.number_of_point = 2048
+
+        self.Down_layers = nn.ModuleList()
+        self.Up_layers = nn.ModuleList()
+
+        prev = 0 
+        for indx,layer in enumerate(layer_down):
+            self.Down_layers.append(XConv(prev,layer,kernel_size= kernel_size_down[0],hidden_channels = hidden_layer_down[0]))
+            if indx > 0 :
+                 prev = layer[indx-1]
+
+
+        prev = layer_up[-1] 
+        for indx,layer in enumerate(layer_up):
+            self.Up_layers.append(XConv(prev,layer,kernel_size= kernel_size_up[0],hidden_channels = hidden_layer_up[0]))
+            if indx > 0 :
+                 prev = layer[indx-1]
+
+        print(self.Down_layers)
+        print(self.Up_layers)
+        
+
+Net = POINTCNN_SEG_2(10)
