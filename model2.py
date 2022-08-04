@@ -277,6 +277,8 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
 
         out_batch = torch.zeros(self.batch_size,self.num_classes,pos4.shape[0]) 
+        print(out_batch.shape)
+        print(x4)
         out = x4.T
    
         for b in range(self.batch_size):
