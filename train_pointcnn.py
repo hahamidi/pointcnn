@@ -214,7 +214,7 @@ if __name__ == '__main__':
     # number_ofpoints = number of points in the point cloud
     # class_choice = which class to train on
     parser = argparse.ArgumentParser()
-    parser.add_argument('batch_size', type=int, default=8, help='batch size')
+    parser.add_argument('--batch_size', type=int, default=16, help='batch size')
     parser.add_argument('--epochs', type=int, default=2000, help='number of epochs')
     parser.add_argument('--num_points', type=int, default=2048,help='num of points to use')
 
