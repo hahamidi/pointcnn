@@ -218,10 +218,12 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
     #pytorch geometric layer need batch and pos as input batch is like batch = [1,1,2,2,3,3] means firest data is batch 1 
     # and second data is batch 2 and so on
-    def pre_pointcnn(self,points):
+    def pre_pointcnn(self,points, begin_of_model = True):
 
-        self.batch_size = points.shape[0]
-        self.number_of_point = points.shape[1]
+        
+        if begin_of_model:
+            self.number_of_point = points.shape[1]
+            self.batch_size = points.shape[0]
 
         batch_zero = torch.zeros(points[0].shape[0],dtype=torch.int64)
         batch = torch.zeros(points[0].shape[0],dtype=torch.int64)
@@ -276,7 +278,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         # from batch [N] and data [P,C] to batch [N,P,C]
 
 
-        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024,).to(self.device) 
+        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024).to(self.device) 
         
         
 
@@ -285,7 +287,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         print()        
         X_attention,_  = self.multihead_attn(out_batch, out_batch, out_batch)
         print(X_attention.shape)
-        X_attention,batch4 = self.pre_pointcnn(X_attention)
+        X_attention,batch4 = self.pre_pointcnn(X_attention,begin_of_model=False)
         print(X_attention.shape)
        
 
