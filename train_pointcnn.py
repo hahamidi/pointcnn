@@ -49,34 +49,33 @@ class Trainer():
 
 
    
-    def train_one_epoch(self,epoch_num):
+    def train_one_epoch(self):
 
                 epoch_train_loss = []
                 epoch_train_acc = []
                 batch_number = 0
                 self.model = self.model.train()
+                #label is class in classification
+                #target is class in segmentation
+               
                 for points,labels,targets in self.train_data_loader:
                     batch_number += 1
 
+                    # make target from zero to number_of_classes-1
                     targets = targets - self.start_index
-
-
                     points, targets = points.to(self.device), targets.to(self.device)
 
                     if points.shape[0] <= 1:
                         continue
 
+
                     self.optimizer.zero_grad()
                     preds = self.model(points)
-
-             
-
-
                     loss =  self.loss_function(preds, targets)  # * regularization_loss
-                    print(loss.item())
-  
-                    epoch_train_loss.append(loss.cpu().item())
                     loss.backward()
+                    print(self.blue("Train Loss",loss.item()))
+
+                    epoch_train_loss.append(loss.cpu().item())
                     self.optimizer.step()
                     if args.scheduler == 'cos':
                         self.scheduler.step()
@@ -89,48 +88,48 @@ class Trainer():
 
                     preds = preds.data.max(1)[1]
                     corrects = preds.eq(targets.data).cpu().sum()
-                    accuracy = corrects.item() / float(self.train_data_loader.batch_size*2500)
+                    accuracy = corrects.item() / float(self.train_data_loader.batch_size*args.num_points)
                     epoch_train_acc.append(accuracy)
+
                 print("Loss",np.mean(epoch_train_loss))
                 print("Accuracy",np.mean(epoch_train_acc))
 
                                                                         
-    def val_one_epoch(self,epoch_num):
+    def val_one_epoch(self):
         epoch_val_loss = []
         epoch_val_acc = []
         batch_number = 0
         shape_ious = []
         self.model = self.model.eval()
+        # use tensorflow to calculate IoU
         with tensorflow.device('/cpu:0'):
-            m = MeanIoU(self.number_of_classes, name=None, dtype=None)
+            MIOU_obj = MeanIoU(self.number_of_classes, name=None, dtype=None)
             for points,labels,targets in self.val_data_loader:
+
                         targets = targets - self.start_index
-                        
-
                         batch_number += 1
-
-    
                         points, targets = points.to(self.device), targets.to(self.device)
 
 
-                        
+                
                         if points.shape[0] <= 1:
                             continue
+
                         with torch.no_grad():                        
                                 preds = self.model(points)
                                 loss =  self.loss_function(preds, targets)
-                                print("---",loss.item())
+                                print(self.red("Val Loss",loss.item()))
                         epoch_val_loss.append(loss.cpu().item())
+
                         preds = preds.data.max(1)[1]
                         pred_np = preds.cpu().data.numpy()
                         target_np = targets.cpu().data.numpy()
-                        m.update_state(pred_np, target_np)
-                        part_ious = m.result().numpy()
+                        MIOU_obj.update_state(pred_np, target_np)
+                        part_ious = MIOU_obj.result().numpy()
                         shape_ious.append(np.mean(part_ious))
 
                         corrects = preds.eq(targets.data).cpu().sum()
-
-                        accuracy = corrects.item() / float(self.val_data_loader.batch_size*2500)
+                        accuracy = corrects.item() / float(self.val_data_loader.batch_size*args.num_points)
                         epoch_val_acc.append(accuracy)
 
         print("Loss",np.mean(epoch_val_loss))
@@ -209,9 +208,10 @@ class Trainer():
 
     
 if __name__ == '__main__':
+    
+    # number_ofpoints = number of points in the point cloud
+    # class_choice = which class to train on
     parser = argparse.ArgumentParser()
-
-
     parser.add_argument('--batch_size', type=int, default=8, help='batch size')
     parser.add_argument('--epochs', type=int, default=2000, help='number of epochs')
     parser.add_argument('--num_points', type=int, default=2048,help='num of points to use')
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-
+    # select training data and test data
     train_dataset = ShapeNetPart(partition='trainval', num_points=args.num_points, class_choice=args.class_choice)
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.batch_size,
@@ -244,16 +244,19 @@ if __name__ == '__main__':
                                                         num_workers=2,drop_last=True)
 
 
-
+    # create model and optimizer
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net(train_dataset.seg_num_all)
     model.to(device)       
     opt = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
-
     if args.scheduler == 'cos':
         scheduler = CosineAnnealingLR(opt, args.epochs, eta_min=1e-3)
     elif args.scheduler == 'step':
         scheduler = StepLR(opt, step_size=20, gamma=0.5)
+
+    # trainer loop 
+    # number_of_classes is number of class in selected category for example, if we select guitar, then number of class is 3 see data.py for more details
+    # start_index is the index of the first class in selected category for example, if we select guitar, then start_index is 19 see data.py for more details
 
     trainer = Trainer(model = model,
                         train_data_loader = train_dataloader, 
