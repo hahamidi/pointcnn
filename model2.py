@@ -336,12 +336,12 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
         X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
         # X_OUT = self.BN(X_OUT)
-
+        print(X_OUT.shape)
         X_OUT = self.fc_lyaer1(xo1_after_mlp)
         X_OUT = self.Relu(X_OUT)
         X_OUT = self.DROP(X_OUT)
         X_OUT = self.fc_lyaer2(X_OUT)
-
+        print(X_OUT.shape)
         X_OUT = self.after_pred(X_OUT,batch=batch0)
         # print(X_OUT.shape)
 
