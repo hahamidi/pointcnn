@@ -92,8 +92,8 @@ class Trainer():
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*args.num_points)
                     epoch_train_acc.append(accuracy)
 
-                print(self.yellow("Loss "+np.mean(epoch_train_loss)))
-                print(self.yellow("Accuracy "+np.mean(epoch_train_acc)))
+                print(self.yellow("Loss "+str(np.mean(epoch_train_loss))))
+                print(self.yellow("Accuracy "+str(np.mean(epoch_train_acc))))
                 
 
                                                                         
