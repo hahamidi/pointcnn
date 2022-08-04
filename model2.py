@@ -101,11 +101,11 @@ class POINTCNN_SEG(torch.nn.Module):
         print(x2.shape)
         x2 = F.relu(self.conv2(x2, pos2, batch2))
 
-        x3, pos3, batch3 = self.down_sampler(x2, pos2, batch2 , ratio = 0.2)
+        x3, pos3, batch3 = self.down_sampler(x2, pos2, batch2 , ratio = 0.375)
         print(x3.shape)
         x3 = F.relu(self.conv3(x3, pos3, batch3))
 
-        x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.2)
+        x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.375)
         print(x4.shape)
         x4 = F.relu(self.conv4(x4, pos4, batch4))
 
