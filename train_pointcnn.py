@@ -225,7 +225,7 @@ if __name__ == '__main__':
                         choices=['cos', 'step'],
                         help='Scheduler to use, [cos, step]')
 
-    parser.add_argument('--class_choice', type=str, default="guitar", metavar='N',
+    parser.add_argument('--class_choice', type=str, default="bag", metavar='N',
                         choices=['airplane', 'bag', 'cap', 'car', 'chair',
                                  'earphone', 'guitar', 'knife', 'lamp', 'laptop', 
                                  'motor', 'mug', 'pistol', 'rocket', 'skateboard', 'table'])
