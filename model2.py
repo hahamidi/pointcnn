@@ -281,9 +281,9 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         print(x4)
         out = x4.T
    
-        for b in range(self.batch_size):
-            out_batch[b,:,:] = out[batch4 == b].T
-        print(out_batch.shape)
+        # for b in range(self.batch_size):
+        #     out_batch[b,:,:] = out[batch4 == b].T
+        # print(out_batch.shape)
 
 
         # X_Key = self.K(x4.T)
@@ -338,6 +338,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         X_OUT = self.fc_lyaer2(X_OUT)
 
         X_OUT = self.after_pred(X_OUT,batch=batch0)
+        print(X_OUT.shape)
 
 
         return X_OUT
