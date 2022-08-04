@@ -343,15 +343,15 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         
         
         
-if __file__ == "__main__":
-    Net = POINTCNN_SEG(10)
 
-    pp=0
-    for p in list(Net.parameters()):
+Net = POINTCNN_SEG(10)
+
+pp=0
+for p in list(Net.parameters()):
         nn=1
         # print(p)
         for s in list(p.size()):
             nn = nn*s
         pp += nn
 
-    print(pp)
+print(pp)
