@@ -172,9 +172,8 @@ class POINTCNN_SEG_2(torch.nn.Module):
         super().__init__()
         layer_down      = [256,512,768,1024]
         layer_up        = [1024,768,512,256]
-
-        hidden_layer_down      = [(0 + 256) / 2, (256 + 512) / 2, (512 + 768) / 2, (768 + 1024) / 2]
-        hidden_layer_up   = [(1024 + 768) / 2, (768 + 512) / 2, (512 + 256) / 2, (256 + 0) / 2]
+        hidden_layer_down      = [int((0 + 256) / 2), int((256 + 512) / 2), int((512 + 768) / 2), int((768 + 1024) / 2)]
+        hidden_layer_up   = [int((1024 + 768) / 2), int((768 + 512) / 2), int((512 + 256) / 2), int((256 + 0) / 2)]
 
         kernel_size_down       = [8,12,16,16]
         kernel_size_up         = [16,16,12,8]
