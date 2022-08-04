@@ -277,13 +277,17 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
 
         out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024) 
-        print(out_batch.shape)
+        
         
 
         for b in range(self.batch_size):
             print(x4[batch4 == b].shape)
             out_batch[b,:,:] = x4[batch4 == b]
-        print(out_batch.shape)
+        
+
+        X_attention  = nn.multihead_attn(out_batch, out_batch, out_batch)
+        print(X_attention.shape)
+       
 
 
         # X_Key = self.K(x4.T)
