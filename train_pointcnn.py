@@ -45,6 +45,7 @@ class Trainer():
 
         self.blue= lambda x: '\033[94m' + x + '\033[0m'
         self.red = lambda x: '\033[91m' + x + '\033[0m'
+        self.yellow = lambda x: '\033[93m' + x + '\033[0m'
 
 
 
@@ -91,8 +92,9 @@ class Trainer():
                     accuracy = corrects.item() / float(self.train_data_loader.batch_size*args.num_points)
                     epoch_train_acc.append(accuracy)
 
-                print("Loss",np.mean(epoch_train_loss))
-                print("Accuracy",np.mean(epoch_train_acc))
+                print(self.yellow("Loss "+np.mean(epoch_train_loss)))
+                print(self.yellow("Accuracy "+np.mean(epoch_train_acc)))
+                
 
                                                                         
     def val_one_epoch(self,epoch):
@@ -195,8 +197,8 @@ class Trainer():
                 
                 self.train_one_epoch(epoch)
                 self.val_one_epoch(epoch)
-                if epoch % 20 == 0:
-                   self.save_model_optimizer(epoch)
+                # if epoch % 20 == 0:
+                #    self.save_model_optimizer(epoch)
 
                 
                 # self.scheduler.step()
