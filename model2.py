@@ -71,28 +71,29 @@ class POINTCNN_SEG(torch.nn.Module):
             )
 
 
+        ##head because of in pytorch geometric we can't use batch dimention like [1,num_classes,number_of_point] we cant use nn.sequential 
+        self.fc_lyaer1 = nn.Conv1d(256, 128, kernel_size=1,bias = False)
+        self.Relu = nn.ReLU(True)
+        self.DROP = nn.Dropout(0.5)
+        self.fc_lyaer2 =nn.Conv1d(128, self.num_classes, kernel_size=1)
 
 
         self.batch_size = 16
         self.number_of_point = 2048
 
     def after_pred(self,preds,batch):
-        # print(preds.shape)
-        # preds = preds[0]
+
         out_batch = torch.zeros(self.batch_size,self.num_classes,self.number_of_point )
         out = preds.T
    
         for b in range(self.batch_size):
-            # print(out[batch == b].T.shape)
-            # print(out_batch[b,:,:].shape)
             out_batch[b,:,:] = out[batch == b].T
         preds = out_batch
         preds = preds.to(self.device)
         return preds
 
     def pre_pointcnn(self,points):
-        # print(points)
-        # print(points.shape)
+
         self.batch_size = points.shape[0]
         self.number_of_point = points.shape[1]
 
@@ -154,7 +155,10 @@ class POINTCNN_SEG(torch.nn.Module):
         X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
         # X_OUT = self.BN(X_OUT)
 
-        X_OUT = self.fc_lyaer(X_OUT)
+        X_OUT = self.fc_lyaer1(xo1_after_mlp)
+        X_OUT = self.Relu(X_OUT)
+        X_OUT = self.DROP(X_OUT)
+        X_OUT = self.fc_lyaer2(X_OUT)
 
         X_OUT = self.after_pred(X_OUT,batch=batch0)
 
@@ -215,6 +219,4 @@ class POINTCNN_SEG_2(torch.nn.Module):
         pass
         
 
-if __file__ == "__main__":
-        
-    Net = POINTCNN_SEG_2(10)
+Net = POINTCNN_SEG_2(10)
