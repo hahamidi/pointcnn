@@ -261,7 +261,7 @@ if __name__ == '__main__':
                         optimizer = opt,
                         epochs=args.epochs,
                         number_of_classes = train_dataset.seg_num_all,
-                        start_index = train_dataset.seg_start_index
+                        start_index = train_dataset.seg_start_index,
                         loss_function = CrossEntropyLoss(),
                         scheduler = scheduler,
                         device =device)
