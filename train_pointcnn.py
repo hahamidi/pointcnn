@@ -244,9 +244,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    DATASETS = {
-                'shapenet': ShapeNetDataset,
-            }
+
     train_dataset = ShapeNetPart(partition='trainval', num_points=args.num_points, class_choice=args.class_choice)
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                         batch_size=args.batch_size,
