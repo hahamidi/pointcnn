@@ -1,5 +1,6 @@
 import argparse
 from audioop import bias
+from telnetlib import SE
 
 import torch
 import torch.nn as nn
@@ -62,11 +63,14 @@ class POINTCNN_SEG(torch.nn.Module):
 
         self.down_sampler = down_sample_layer
 
+        self.fc_lyaer = nn.Sequential(
+            nn.Conv1d(256, 128, kernel_size=1, bias=False),
+            nn.ReLU(True),
+            nn.Dropout(0.5),
+            nn.Conv1d(128, self.num_classes, kernel_size=1),
+            )
 
-        self.fc_lyaer1 = nn.Conv1d(256, 128, kernel_size=1,bias = False)
-        self.BN = nn.BatchNorm1d(128)
-        self.DROP = nn.Dropout(0.5)
-        self.fc_lyaer2 =nn.Conv1d(128, self.num_classes, kernel_size=1)
+
 
 
         self.batch_size = 16
@@ -150,9 +154,7 @@ class POINTCNN_SEG(torch.nn.Module):
         X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
         # X_OUT = self.BN(X_OUT)
 
-        X_OUT = self.fc_lyaer1(xo1_after_mlp)
-        X_OUT = self.DROP(X_OUT)
-        X_OUT = self.fc_lyaer2(X_OUT)
+        X_OUT = self.fc_lyaer(X_OUT)
 
         X_OUT = self.after_pred(X_OUT,batch=batch0)
 
@@ -186,6 +188,7 @@ class POINTCNN_SEG_2(torch.nn.Module):
 
         self.Down_layers = nn.ModuleList()
         self.Up_layers = nn.ModuleList()
+        self.MLPs    = nn.ModuleList()
 
         prev = 0 
         for indx,layer in enumerate(layer_down):
@@ -200,8 +203,16 @@ class POINTCNN_SEG_2(torch.nn.Module):
             if indx > 0 :
                  prev = layer[indx-1]
 
-        print(self.Down_layers)
-        print(self.Up_layers)
+        for index,layer in enumerate(layer_up):
+            self.MLPs.append(nn.Conv1d(layer, layer, kernel_size=1))
+        
+        self.fully_conecteds = nn.Conv1d(layer_up[-1], layer_up[-1], kernel_size=1)
+
+
+
+
+    def forward(self):
+        pass
         
 
 Net = POINTCNN_SEG_2(10)
