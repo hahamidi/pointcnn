@@ -189,7 +189,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
 
         #attention 
-        self.multihead_attn = nn.MultiheadAttention( 1024 , 2,batch_first =True)
+        self.multihead_attn = nn.MultiheadAttention( 1024 , 8 ,batch_first =True)
 
         
 

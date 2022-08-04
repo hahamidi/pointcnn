@@ -11,7 +11,7 @@ import random
 from tensorflow.keras.metrics import MeanIoU
 from torch.nn import CrossEntropyLoss
 from sklearn.manifold import TSNE as sklearnTSNE
-from model2 import POINTCNN_SEG_attention as Net
+from model2 import POINTCNN_SEG_attention,POINTCNN_SEG
 from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from data import ShapeNetPart
 
@@ -248,7 +248,7 @@ if __name__ == '__main__':
 
     # create model and optimizer
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Net(train_dataset.seg_num_all)
+    model = POINTCNN_SEG_attention(train_dataset.seg_num_all)
     model.to(device)       
     opt = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
     if args.scheduler == 'cos':
