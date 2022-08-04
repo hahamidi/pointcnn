@@ -262,6 +262,7 @@ class POINTCNN_SEG_2(torch.nn.Module):
         pos_loop = pos0
         batch_loop = batch0
         X_loop = None
+        X_loop =  X_loop.to(self.device)
 
         for index,layer in enumerate(self.Down_layers):
 
