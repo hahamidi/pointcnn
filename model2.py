@@ -275,12 +275,13 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         # from batch [N] and data [P,C] to batch [N,P,C]
 
 
-        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024) 
+        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024,).to(self.device) 
         
         
 
         for b in range(self.batch_size):
-            out_batch[b,:,:] = x4[batch4 == b]        
+            out_batch[b,:,:] = x4[batch4 == b]
+        print()        
         X_attention  = self.multihead_attn(out_batch, out_batch, out_batch)
         print(X_attention.shape)
         X_attention = self.pre_pointcnn(X_attention)
