@@ -60,17 +60,10 @@ class POINTCNN_SEG(torch.nn.Module):
         self.batch_size = 16
         self.number_of_point = 2048
 
-    def after_pred(self,preds,batch):
 
-        out_batch = torch.zeros(self.batch_size,self.num_classes,self.number_of_point )
-        out = preds.T
-   
-        for b in range(self.batch_size):
-            out_batch[b,:,:] = out[batch == b].T
-        preds = out_batch
-        preds = preds.to(self.device)
-        return preds
 
+    #pytorch geometric layer need batch and pos as input batch is like batch = [1,1,2,2,3,3] means firest data is batch 1 
+    # and second data is batch 2 and so on
     def pre_pointcnn(self,points):
 
         self.batch_size = points.shape[0]
@@ -85,28 +78,44 @@ class POINTCNN_SEG(torch.nn.Module):
         points = point_for_pointcnn
         points = points.to(self.device)
         batch = batch.to(self.device)
-        # print(points.shape)
-        # print(batch)
+
         
         return points,batch
+
+
+    #after predict we need to reshape the output to be like [batch,num_classes,number_of_point] beacuse of pytorch geometric layer condition 
+    #see pre_pointcnn comment for more information
+
+    def after_pred(self,preds,batch):
+
+        out_batch = torch.zeros(self.batch_size,self.num_classes,self.number_of_point )
+        out = preds.T
+   
+        for b in range(self.batch_size):
+            out_batch[b,:,:] = out[batch == b].T
+        preds = out_batch
+        preds = preds.to(self.device)
+        return preds
         
+
+
     def forward(self,points):
         pos0,batch0 = self.pre_pointcnn(points)
         
         pos1,batch1 = pos0, batch0
-        print(pos1.shape)
+        # print(pos1.shape)
         x1 = F.relu(self.conv1(None, pos1, batch1))
 
         x2, pos2, batch2 = self.down_sampler(x1, pos1, batch1)
-        print(x2.shape)
+        # print(x2.shape)
         x2 = F.relu(self.conv2(x2, pos2, batch2))
 
         x3, pos3, batch3 = self.down_sampler(x2, pos2, batch2 , ratio = 0.375)
-        print(x3.shape)
+        # print(x3.shape)
         x3 = F.relu(self.conv3(x3, pos3, batch3))
 
         x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.375)
-        print(x4.shape)
+        # print(x4.shape)
         x4 = F.relu(self.conv4(x4, pos4, batch4))
 
         xo4 = F.relu(self.conv_up4(x4, pos4, batch4))
