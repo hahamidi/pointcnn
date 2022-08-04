@@ -102,7 +102,10 @@ class POINTCNN_SEG(torch.nn.Module):
         x3, pos3, batch3 = self.down_sampler(x2, pos2, batch2)
         x3 = F.relu(self.conv3(x3, pos3, batch3))
 
-        x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.5)
+        x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.125)
+        print(x4.shape)
+        print(pos4.shape)
+        print(batch4.shape)
         x4 = F.relu(self.conv4(x4, pos4, batch4))
 
         xo4 = F.relu(self.conv_up4(x4, pos4, batch4))
