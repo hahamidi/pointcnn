@@ -11,7 +11,7 @@ import random
 from tensorflow.keras.metrics import MeanIoU
 from torch.nn import CrossEntropyLoss
 from sklearn.manifold import TSNE as sklearnTSNE
-from model2 import POINTCNN_SEG as Net
+from model2 import POINTCNN_SEG_attention as Net
 from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from data import ShapeNetPart
 
