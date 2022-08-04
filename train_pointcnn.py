@@ -14,6 +14,7 @@ from sklearn.manifold import TSNE as sklearnTSNE
 from model2 import POINTCNN_SEG as Net
 from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from data import ShapeNetPart
+
 dire = os.getcwd().split('/')
 dire = '/'.join(dire)
 
@@ -113,7 +114,6 @@ class Trainer():
 
 
                         
-                        batch = batch.to(self.device)
                         if points.shape[0] <= 1:
                             continue
                         with torch.no_grad():                        
@@ -210,19 +210,14 @@ class Trainer():
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument('dataset', type=str, choices=['shapenet', 'mnist'], help='dataset to train on')
-    # parser.add_argument('dataset_folder', type=str, help='path to the dataset folder')
-    parser.add_argument('--task', type=str,default = 'segmentation' , choices=['classification', 'segmentation'], help='type of task')
-    # parser.add_argument('output_folder', type=str, help='output folder')
-    parser.add_argument('--number_of_points', type=int, default=2500, help='number of points per cloud')
+
+
     parser.add_argument('--batch_size', type=int, default=8, help='batch size')
     parser.add_argument('--epochs', type=int, default=2000, help='number of epochs')
     parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate')
     parser.add_argument('--number_of_workers', type=int, default=1, help='number of workers for the dataloader')
-    # parser.add_argument('--model_checkpoint', type=str, default='', help='model checkpoint path')
     parser.add_argument('--model_checkpoint', type=str, default='', help='model checkpoint path')
-    parser.add_argument('--num_points', type=int, default=2048,
-                        help='num of points to use')
+    parser.add_argument('--num_points', type=int, default=2048,help='num of points to use')
     parser.add_argument('--dropout', type=float, default=0.5,
                         help='dropout rate')
     parser.add_argument('--emb_dims', type=int, default=1024, metavar='N',
