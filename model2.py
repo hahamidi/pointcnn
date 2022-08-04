@@ -284,17 +284,12 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
         for b in range(self.batch_size):
             out_batch[b,:,:] = x4[batch4 == b]
-        print()        
         X_attention,_  = self.multihead_attn(out_batch, out_batch, out_batch)
-        print(X_attention.shape)
-        X_attention,batch4 = self.pre_pointcnn(X_attention,begin_of_model=False)
-        print(X_attention.shape)
+        x4,batch4 = self.pre_pointcnn(X_attention,begin_of_model=False)
        
 
 
-        # X_Key = self.K(x4.T)
-        # X_Query = self.Q(x4.T)
-        # X_Value = self.V(x4.T)
+
 
 
 
@@ -314,15 +309,12 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         xo3 = F.relu(self.conv_up3(Xo3_in, pos3, batch3))
 
 
-        print("--------------------")
         xo3_concat = (xo3 + x3).T
         xo3_after_mlp = self.mlp_out3(xo3_concat).T
         Xo2_in = knn_interpolate(x = xo3_after_mlp, pos_x=pos3 , batch_x=batch3 , k=3 ,pos_y=pos2,batch_y=batch2)
-        print("--------------------")
 
         xo2 = F.relu(self.conv_up2(Xo2_in, pos2, batch2))
 
-        print("--------------------")
 
         xo2_concat = (xo2 + x2).T
 
@@ -335,7 +327,6 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         xo1_concat = (xo1 + x1).T
 
         X_OUT = self.mlp_out1(xo1_concat)
-        print("--------------------")
 
         # X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
         # X_OUT = self.BN(X_OUT)
