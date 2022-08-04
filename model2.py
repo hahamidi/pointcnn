@@ -249,6 +249,7 @@ class POINTCNN_SEG_2(torch.nn.Module):
 
     def forward(self,points):
         pos0,batch0 = self.pre_pointcnn(points)
+        print(pos0,batch0)
 
         forward_down_features = []
 
