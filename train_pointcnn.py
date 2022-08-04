@@ -26,6 +26,7 @@ class Trainer():
                         optimizer ,
                         epochs,
                         number_of_classes,
+                        start_index,
                         loss_function,
                         scheduler,
                         device):
@@ -38,8 +39,7 @@ class Trainer():
         self.loss_function = loss_function
         self.scheduler = scheduler
         self.device = device
-        self.start_index = 19
-
+        self.start_index = start_index
         self.load_model = False
         self.load_epoch = 1980
 
@@ -214,23 +214,15 @@ if __name__ == '__main__':
 
     parser.add_argument('--batch_size', type=int, default=8, help='batch size')
     parser.add_argument('--epochs', type=int, default=2000, help='number of epochs')
-    parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate')
-    parser.add_argument('--number_of_workers', type=int, default=1, help='number of workers for the dataloader')
-    parser.add_argument('--model_checkpoint', type=str, default='', help='model checkpoint path')
     parser.add_argument('--num_points', type=int, default=2048,help='num of points to use')
-    parser.add_argument('--dropout', type=float, default=0.5,
-                        help='dropout rate')
-    parser.add_argument('--emb_dims', type=int, default=1024, metavar='N',
-                        help='Dimension of embeddings')
-    parser.add_argument('--k', type=int, default=40, metavar='N',
-                        help='Num of nearest neighbors to use')
-    parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
-                        help='learning rate (default: 0.001, 0.1 if using sgd)')
-    parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
-                        help='SGD momentum (default: 0.9)')
+
+    
+    parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate')
+    parser.add_argument('--momentum', type=float, default=0.9, metavar='M', help='SGD momentum (default: 0.9)')
     parser.add_argument('--scheduler', type=str, default='cos', metavar='N',
                         choices=['cos', 'step'],
                         help='Scheduler to use, [cos, step]')
+
     parser.add_argument('--class_choice', type=str, default="guitar", metavar='N',
                         choices=['airplane', 'bag', 'cap', 'car', 'chair',
                                  'earphone', 'guitar', 'knife', 'lamp', 'laptop', 
@@ -252,38 +244,27 @@ if __name__ == '__main__':
                                                         num_workers=args.number_of_workers,drop_last=True)
 
 
-    if args.task == 'segmentation':
-            # model = SegmentationPointNet(num_classes=train_dataset.NUM_SEGMENTATION_CLASSES,
-            #                          point_dimension=train_dataset.POINT_DIMENSION)
-            model = Net(train_dataset.seg_num_all)
-            # print(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.to(device)
-
-
-
-
-           
+    model = Net(train_dataset.seg_num_all)
+    model.to(device)       
     opt = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
-    print("opt loaded")
+
     if args.scheduler == 'cos':
         scheduler = CosineAnnealingLR(opt, args.epochs, eta_min=1e-3)
-
-
     elif args.scheduler == 'step':
         scheduler = StepLR(opt, step_size=20, gamma=0.5)
+
     trainer = Trainer(model = model,
                         train_data_loader = train_dataloader, 
                         val_data_loader = test_dataloader, 
                         optimizer = opt,
                         epochs=args.epochs,
                         number_of_classes = train_dataset.seg_num_all,
+                        start_index = train_dataset.seg_start_index
                         loss_function = CrossEntropyLoss(),
                         scheduler = scheduler,
                         device =device)
-    print(train_dataset.seg_num_all)
     trainer.train()
 
 
