@@ -348,10 +348,10 @@ Net = POINTCNN_SEG(10)
 
 pp=0
 for p in list(Net.parameters()):
-        nn=1
+        nnm=1
         # print(p)
         for s in list(p.size()):
-            nn = nn*s
-        pp += nn
+            nnm = nnm*s
+        pp += nnm
 
 print(pp)
