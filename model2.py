@@ -273,37 +273,30 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         x4, pos4, batch4 = self.down_sampler(x3, pos3, batch3,ratio=0.375)
         # print(x4.shape)
         x4 = F.relu(self.conv4(x4, pos4, batch4))
-        ################################################
-        # from batch [N] and data [P,C] to batch [N,P,C]
 
-
-        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024).to(self.device) 
-        
-        
-
-        for b in range(self.batch_size):
-            out_batch[b,:,:] = x4[batch4 == b]
-        X_attention,_  = self.multihead_attn(out_batch, out_batch, out_batch)
-        x4,batch4 = self.pre_pointcnn(X_attention,begin_of_model=False)
-       
-
-
-
-
-
-
-
-
-
-
-
-
-        #################################################
 
         xo4 = F.relu(self.conv_up4(x4, pos4, batch4))
 
         xo4_concat = (xo4 + x4).T
         xo4_after_mlp = self.mlp_out4(xo4_concat).T
+        ################################################
+        # from batch [N] and data [P,C] to batch [N,P,C]
+        ################################################
+        # attention layer
+        out_batch = torch.zeros(self.batch_size, int(pos4.shape[0] / self.batch_size) ,1024).to(self.device) 
+        
+
+        for b in range(self.batch_size):
+            out_batch[b,:,:] = xo4_after_mlp[batch4 == b]
+        X_attention,_  = self.multihead_attn(out_batch, out_batch, out_batch)
+        xo4_after_mlp,batch4 = self.pre_pointcnn(X_attention,begin_of_model=False)
+       
+        #################################################
+
+
+
+
+
         Xo3_in = knn_interpolate(x = xo4_after_mlp, pos_x=pos4 , batch_x=batch4 , k=3 ,pos_y=pos3,batch_y=batch3)
         xo3 = F.relu(self.conv_up3(Xo3_in, pos3, batch3))
 
