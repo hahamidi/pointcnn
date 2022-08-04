@@ -197,18 +197,16 @@ class POINTCNN_SEG_2(torch.nn.Module):
         prev = 0 
         for indx,layer in enumerate(layer_down):
             print(prev,"|",layer,"|",hidden_layer_down[indx],"|",kernel_size_down[indx],"|",dilation_down[indx])
-            layer_temp  = XConv(prev,layer,dim = dim_size,kernel_size= kernel_size_down[indx],hidden_channels = hidden_layer_down[indx])
-            print(2)
-            self.Down_layers.append(layer_temp)
+            self.Down_layers.append(XConv(prev,layer,dim = dim_size,kernel_size= kernel_size_down[indx],hidden_channels = hidden_layer_down[indx]))
             if indx > 0 :
-                 prev = layer[indx-1]
+                 prev = layer_down[indx-1]
 
 
         prev = layer_up[-1] 
         for indx,layer in enumerate(layer_up):
-            self.Up_layers.append(XConv(prev,layer,dim = dim_size ,kernel_size= kernel_size_up[0],hidden_channels = hidden_layer_up[0]))
+            self.Up_layers.append(XConv(prev,layer,dim = dim_size ,kernel_size= kernel_size_up[indx],hidden_channels = hidden_layer_up[indx]))
             if indx > 0 :
-                 prev = layer[indx-1]
+                 prev = layer_up[indx-1]
 
         for index,layer in enumerate(layer_up):
             self.MLPs.append(nn.Conv1d(layer, layer, kernel_size=1))
