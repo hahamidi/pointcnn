@@ -189,7 +189,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
 
         #attention 
-        self.multihead_attn = nn.MultiheadAttention( 1024 , 2,batch_first =True,need_weights =False)
+        self.multihead_attn = nn.MultiheadAttention( 1024 , 2,batch_first =True)
 
         
 
@@ -284,7 +284,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         print()        
         X_attention  = self.multihead_attn(out_batch, out_batch, out_batch)
         print(X_attention.shape)
-        X_attention = self.pre_pointcnn(X_attention)
+        X_attention,_ = self.pre_pointcnn(X_attention)
         print(X_attention.shape)
        
 
