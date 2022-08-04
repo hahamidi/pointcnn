@@ -169,42 +169,41 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
         self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        layers_D = [64,128,256,512]
+        hidden_D = [int((0 + layers_D[0])/ 2 ),int((layers_D[0] + layers_D[1])/ 2 ),int((layers_D[1] + layers_D[2])/ 2 ),int((layers_D[2] + layers_D[3])/ 2 )]
+
+        layers_U = [512,256,128,64]
+        hidden_U = [int((layers_U[0] + layers_U[1])/ 2 ),int((layers_U[1] + layers_U[2])/ 2 ),int((layers_U[2] + layers_U[3])/ 2 ),int((layers_U[3] + layers_U[3])/ 2 )]
 
 
-        self.conv1 = XConv(0, 256, dim=3, kernel_size=8,dilation = 1, hidden_channels= 128)
-        self.conv2 = XConv(256, 512, dim=3, kernel_size=12, hidden_channels=384,dilation=2)
-        self.conv3 = XConv(512, 768, dim=3, kernel_size=16, hidden_channels=640,dilation=2)
-        self.conv4 = XConv(768, 1024, dim=3, kernel_size=16,hidden_channels=896, dilation=4)
+        self.conv1 = XConv(0, layers_D[0], dim=3, kernel_size=8,dilation = 1, hidden_channels= hidden_D[0])
+        self.conv2 = XConv(layers_D[0], layers_D[1], dim=3, kernel_size=12, hidden_channels=hidden_D[1],dilation=2)
+        self.conv3 = XConv(layers_D[1], layers_D[2], dim=3, kernel_size=16, hidden_channels=hidden_D[2],dilation=2)
+        self.conv4 = XConv(layers_D[2], layers_D[3], dim=3, kernel_size=16,hidden_channels=hidden_D[3], dilation=4)
 
-        self.conv_up4 = XConv(1024, 1024, dim=3, kernel_size=16,hidden_channels=896, dilation=4)
-        self.conv_up3 = XConv(1024 , 768 , dim=3, kernel_size=16,hidden_channels=896, dilation=2)
-        self.conv_up2 = XConv(768 , 512 , dim=3, kernel_size=12,hidden_channels=640, dilation=2)
-        self.conv_up1 = XConv(512, 256 , dim=3, kernel_size=8,hidden_channels=120, dilation=2)
+        self.conv_up4 = XConv(layers_U[0], layers_U[0], dim=3, kernel_size=16,hidden_channels=hidden_U[0], dilation=4)
+        self.conv_up3 = XConv(layers_U[0] , layers_U[1] , dim=3, kernel_size=16,hidden_channels=hidden_U[1], dilation=2)
+        self.conv_up2 = XConv(layers_U[1] , layers_U[2] , dim=3, kernel_size=12,hidden_channels=hidden_U[2], dilation=2)
+        self.conv_up1 = XConv(layers_U[2], layers_U[3] , dim=3, kernel_size=8,hidden_channels=hidden_U[3], dilation=2)
 
-        self.mlp_out4 = nn.Conv1d(1024, 1024, kernel_size=1)
-        self.mlp_out3 = nn.Conv1d(768, 768, kernel_size=1)
-        self.mlp_out2 = nn.Conv1d(512, 512, kernel_size=1)
-        self.mlp_out1 = nn.Conv1d(256, 256, kernel_size=1)
+        self.mlp_out4 = nn.Conv1d(layers_U[0], layers_U[0], kernel_size=1)
+        self.mlp_out3 = nn.Conv1d(layers_U[1], layers_U[1], kernel_size=1)
+        self.mlp_out2 = nn.Conv1d(layers_U[2], layers_U[2], kernel_size=1)
+        self.mlp_out1 = nn.Conv1d(layers_U[3], layers_U[3], kernel_size=1)
 
 
         #attention 
-        self.multihead_attn = nn.MultiheadAttention( 1024 , 8 ,batch_first =True)
+        self.multihead_attn = nn.MultiheadAttention( layers_U[0] , 8 ,batch_first =True)
 
         
 
 
         self.down_sampler = down_sample_layer
 
-        self.fc_lyaer = nn.Sequential(
-            nn.Conv1d(256, 128, kernel_size=1, bias=False),
-            nn.ReLU(True),
-            nn.Dropout(0.5),
-            nn.Conv1d(128, self.num_classes, kernel_size=1),
-            )
 
 
         ##head because of in pytorch geometric we can't use batch dimention like [1,num_classes,number_of_point] we cant use nn.sequential 
-        self.fc_lyaer1 = nn.Conv1d(256, 128, kernel_size=1,bias = False)
+        self.fc_lyaer1 = nn.Conv1d( layers_U[3] , 128, kernel_size=1,bias = False)
         self.Relu = nn.ReLU(True)
         self.DROP = nn.Dropout(0.5)
         self.fc_lyaer2 =nn.Conv1d(128, self.num_classes, kernel_size=1)
