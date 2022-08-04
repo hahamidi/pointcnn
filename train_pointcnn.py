@@ -49,7 +49,7 @@ class Trainer():
 
 
    
-    def train_one_epoch(self):
+    def train_one_epoch(self,epoch):
 
                 epoch_train_loss = []
                 epoch_train_acc = []
@@ -73,7 +73,7 @@ class Trainer():
                     preds = self.model(points)
                     loss =  self.loss_function(preds, targets)  # * regularization_loss
                     loss.backward()
-                    print(self.blue("Train Loss",loss.item()))
+                    print(self.blue(str(epoch)+": Train Loss" + str(loss.item())))
 
                     epoch_train_loss.append(loss.cpu().item())
                     self.optimizer.step()
@@ -95,7 +95,7 @@ class Trainer():
                 print("Accuracy",np.mean(epoch_train_acc))
 
                                                                         
-    def val_one_epoch(self):
+    def val_one_epoch(self,epoch):
         epoch_val_loss = []
         epoch_val_acc = []
         batch_number = 0
@@ -118,7 +118,7 @@ class Trainer():
                         with torch.no_grad():                        
                                 preds = self.model(points)
                                 loss =  self.loss_function(preds, targets)
-                                print(self.red("Val Loss",loss.item()))
+                                print(self.red(str(epoch)+": Val Loss"+ str(loss.item())))
                         epoch_val_loss.append(loss.cpu().item())
 
                         preds = preds.data.max(1)[1]
