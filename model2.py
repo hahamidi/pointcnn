@@ -188,10 +188,9 @@ class POINTCNN_SEG_attention(torch.nn.Module):
         self.mlp_out1 = nn.Conv1d(256, 256, kernel_size=1)
 
 
-        #attention Q,K,V
-        self.Q = nn.Conv1d(1024, 1024, kernel_size=1)
-        self.K = nn.Conv1d(1024, 1024, kernel_size=1)
-        self.V = nn.Conv1d(1024, 1024, kernel_size=1)
+        #attention 
+        self.multihead_attn = nn.MultiheadAttention( 1024 , 2,batch_first =True )
+
         
 
 
@@ -282,7 +281,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
         for b in range(self.batch_size):
             out_batch[b,:,:] = x4[batch4 == b]        
-        X_attention  = nn.multihead_attn(out_batch, out_batch, out_batch)
+        X_attention  = self.multihead_attn(out_batch, out_batch, out_batch)
         print(X_attention.shape)
         X_attention = self.pre_pointcnn(X_attention)
         print(X_attention.shape)
