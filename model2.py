@@ -215,4 +215,6 @@ class POINTCNN_SEG_2(torch.nn.Module):
         pass
         
 
-Net = POINTCNN_SEG_2(10)
+if __file__ == "__main__":
+        
+    Net = POINTCNN_SEG_2(10)
