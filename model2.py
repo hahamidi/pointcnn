@@ -243,6 +243,7 @@ class POINTCNN_SEG_attention(torch.nn.Module):
     def after_pred(self,preds,batch):
 
         out_batch = torch.zeros(self.batch_size,self.num_classes,self.number_of_point )
+        print(out_batch.shape)
         out = preds.T
    
         for b in range(self.batch_size):
@@ -331,10 +332,10 @@ class POINTCNN_SEG_attention(torch.nn.Module):
 
         xo1_concat = (xo1 + x1).T
 
-        xo1_after_mlp = self.mlp_out1(xo1_concat)
+        X_OUT = self.mlp_out1(xo1_concat)
         print("--------------------")
 
-        X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
+        # X_OUT = torch.unsqueeze(xo1_after_mlp.T, 0)
         # X_OUT = self.BN(X_OUT)
         print(X_OUT.shape)
         X_OUT = self.fc_lyaer1(X_OUT)
