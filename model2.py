@@ -190,9 +190,9 @@ class POINTCNN_SEG_2(torch.nn.Module):
         self.batch_size = 16
         self.number_of_point = 2048
 
-        self.Down_layers = nn.ModuleList()
-        self.Up_layers = nn.ModuleList()
-        self.MLPs    = nn.ModuleList()
+        self.Down_layers = []
+        self.Up_layers = []
+        self.MLPs    = []
         self.down_sampler = down_sample_layer
 
         prev = 0 
