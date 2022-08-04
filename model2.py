@@ -176,8 +176,9 @@ class POINTCNN_SEG_2(torch.nn.Module):
         dilation_down          = [1,2,2,4]
         dilation_up            = [4,2,2,2]
 
+        dim_size = 3
         self.down_sample = [0.375,0.375,0.375,0.375]
-
+    
         self.num_classes = num_classes
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.batch_size = 16
@@ -188,14 +189,14 @@ class POINTCNN_SEG_2(torch.nn.Module):
 
         prev = 0 
         for indx,layer in enumerate(layer_down):
-            self.Down_layers.append(XConv(prev,layer,kernel_size= kernel_size_down[0],hidden_channels = hidden_layer_down[0]))
+            self.Down_layers.append(XConv(prev,layer,dim = dim_size,kernel_size= kernel_size_down[0],hidden_channels = hidden_layer_down[0]))
             if indx > 0 :
                  prev = layer[indx-1]
 
 
         prev = layer_up[-1] 
         for indx,layer in enumerate(layer_up):
-            self.Up_layers.append(XConv(prev,layer,kernel_size= kernel_size_up[0],hidden_channels = hidden_layer_up[0]))
+            self.Up_layers.append(XConv(prev,layer,dim = dim_size ,kernel_size= kernel_size_up[0],hidden_channels = hidden_layer_up[0]))
             if indx > 0 :
                  prev = layer[indx-1]
 
