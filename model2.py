@@ -170,6 +170,7 @@ class POINTCNN_SEG(torch.nn.Module):
 class POINTCNN_SEG_2(torch.nn.Module):
     def __init__(self, num_classes):
         super().__init__()
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         layer_down      = [256,512,768,1024]
         layer_up        = [1024,768,512,256]
         hidden_layer_down      = [int((0 + 256) / 2), int((256 + 512) / 2), int((512 + 768) / 2), int((768 + 1024) / 2)]
