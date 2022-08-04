@@ -245,7 +245,6 @@ class POINTCNN_SEG_attention(torch.nn.Module):
     def after_pred(self,preds,batch):
 
         out_batch = torch.zeros(self.batch_size,self.num_classes,self.number_of_point )
-        print(out_batch.shape)
         out = preds.T
    
         for b in range(self.batch_size):
